@@ -7,6 +7,7 @@ langchain-chroma
 langchain-experimental
 langchain-ollama
 unstructured[all-docs]
+unstructured-inference>=1.6.12  # Windows + Python 3.11에서는 unstructured extra가 이 패키지를 설치하지 않음 (partition_pdf 임포트에 필수)
 pillow
 pydantic
 lxml

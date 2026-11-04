@@ -20,3 +20,6 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+
+# 수업실습파일
+practice
