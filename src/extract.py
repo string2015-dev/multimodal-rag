@@ -12,9 +12,11 @@ from unstructured.partition.pdf import partition_pdf          # PDF 자동 분�
 # ---------------------------------------------------------------------
 # [1] 경로 설정 ─ 한글·공백 없는 경로 사용 (unstructured 오류 방지)
 # ---------------------------------------------------------------------
-PROJECT_ROOT = Path.cwd().parent if Path.cwd().name == "practice" else Path.cwd()
+PROJECT_ROOT =  next(
+    (p for p in [Path.cwd(), *Path.cwd().parents] if(p / ".env").exists()), Path.cwd(),
+)
 fname = "invest.pdf"                                    # 처리할 PDF 파일명
-fpath = str(PROJECT_ROOT / "data") + os.sep             # PDF가 있는 폴더 (끝에 구분자 포함)
+fpath = Path(PROJECT_ROOT) / "data" / fname             # PDF가 있는 폴더 (끝에 구분자 포함)
 assert os.path.exists(fpath + fname), "PDF 경로를 확인하세요"   # 없으면 이후 단계 전부 실패
 
 # ---------------------------------------------------------------------
