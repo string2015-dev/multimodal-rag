@@ -174,7 +174,7 @@ if __name__ == "__main__":
     # ============================================================
     model = build_model()
     chain = build_chain(retriever, model)
-    query = "그래프/표를 봐야만 답할 수 있는 질문을 적으세요"
+    query = "2018~2024년 사이 은행-기업 연계비율이 보험 및 연금기관-가계 연계비율과 교차(역전)한 시점은 언제이고, 2024년 두 값은?"
     start = time.time()
     answer = chain.invoke(query)
     print(f"{time.time() - start:.1f}초\nQ: {query}\n{'-'*70}\n{answer}")
