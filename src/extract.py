@@ -91,4 +91,3 @@ if __name__ == "__main__":
     with open(output_dir / "extracted.pkl", "wb") as f:
         pickle.dump({"texts": texts, "tables": tables, "texts_2k_token": texts_2k_token}, f)
 
-# 다음 단계 예고: 텍스트·표·이미지 각각 요약(VLM 포함) → 요약 임베딩 → 원본과 id로 연결(Multi-Vector)
