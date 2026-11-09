@@ -25,6 +25,6 @@ __pycache__/
 practice
 morning_test
 
-#pkl파일
+# 저장한 pkl파일
 data/processed/
 *.pkl
