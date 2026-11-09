@@ -30,46 +30,45 @@ PDF 선정 기준 충족 여부: 그래프·표 2개 이상(표 6개, 그림 10�
 
 3단계 파이프라인입니다: **① 추출·분할 → ② 요약 → ③ 색인·검색·생성**
 
+색인(① → ② → ③-1)은 질문을 받기 전에 준비하는 단계이고,  
+질의(③-2 → ③-3)는 질문마다 실행합니다.  
+추출·요약 결과는 `.pkl`로 저장해 재사용하지만, 
+ ③-1의 색인은 메모리 저장소라 노트북 세션마다 다시 만듭니다([7. 한계점](#7-한계점)).
+
 ```mermaid
 flowchart TB
-    PDF["invest.pdf (19쪽)"]
-
-    subgraph S1["① 추출·분할 — src/extract.py"]
-        E["unstructured partition_pdf<br/>strategy=hi_res"]
-        T["텍스트 → 2000토큰 / 겹침 200<br/>(청크 4개)"]
-        TB["표 (6개, 문자열)"]
-        IM["그림 (10장)<br/>data/figures/*.jpg"]
+    subgraph IDX["색인 — 질문 전에 준비"]
+        direction LR
+        PDF(["📄 invest.pdf<br/>19쪽"])
+        S1["<b>① 추출·분할</b><br/>unstructured hi_res<br/>텍스트 4청크 · 표 6 · 그림 10"]
+        S2["<b>② 요약</b><br/>gpt-4o-mini (LLM·VLM)<br/>그림은 원본 Base64도 보관"]
+        S3[("<b>③-1 색인 (이중 저장)</b><br/>요약 → Chroma<br/>원본 → InMemoryStore<br/>같은 doc_id 로 연결")]
+        PDF --> S1 --> S2 --> S3
     end
 
-    subgraph S2["② 요약 — src/summarize.py"]
-        ST["텍스트·표 요약<br/>gpt-4o-mini"]
-        SI["이미지 요약 (VLM)<br/>gpt-4o-mini + Base64 원본 보관"]
+    subgraph QRY["질의 — 질문마다 실행"]
+        direction LR
+        Q(["❓ 질문"])
+        R["<b>③-2 검색</b><br/>요약 임베딩 유사도 top-4<br/>→ doc_id 로 <u>원본</u> 조회"]
+        G["<b>③-3 생성</b><br/>gpt-4o-mini<br/>이미지 + 텍스트 입력"]
+        A(["💬 답변"])
+        Q --> R --> G --> A
     end
 
-    subgraph S3["③ 색인·검색·생성 — src/retriever.py"]
-        VS[("Chroma<br/>요약 임베딩 text-embedding-3-small")]
-        DS[("InMemoryStore<br/>원본: 텍스트·표 원문, 이미지 Base64")]
-        R["MultiVectorRetriever<br/>같은 doc_id 로 연결 (k=4)"]
-        G["gpt-4o-mini<br/>이미지 + 텍스트를 한 메시지로 입력"]
-    end
+    IDX -. "저장된 요약·원본 사용" .-> QRY
 
-    Q["질문"] --> R
-    PDF --> E
-    E --> T
-    E --> TB
-    E --> IM
-    T --> ST
-    TB --> ST
-    IM --> SI
-    ST -- "요약" --> VS
-    SI -- "요약" --> VS
-    T -- "원본" --> DS
-    TB -- "원본" --> DS
-    SI -- "원본(Base64)" --> DS
-    R -- "① 질문과 비슷한 요약 검색" --> VS
-    R -- "② doc_id 로 원본 꺼내기" --> DS
-    R --> G
-    G --> A["답변"]
+    classDef input fill:#f1f5f9,stroke:#64748b,color:#0f172a
+    classDef extract fill:#dbeafe,stroke:#2563eb,color:#0f172a
+    classDef summ fill:#ede9fe,stroke:#7c3aed,color:#0f172a
+    classDef store fill:#fef3c7,stroke:#d97706,color:#0f172a
+    classDef query fill:#dcfce7,stroke:#16a34a,color:#0f172a
+    class PDF,Q,A input
+    class S1 extract
+    class S2 summ
+    class S3 store
+    class R,G query
+    style IDX fill:transparent,stroke:#94a3b8,stroke-dasharray:5 5
+    style QRY fill:transparent,stroke:#94a3b8,stroke-dasharray:5 5
 ```
 
 **핵심 아이디어 — 왜 "요약으로 검색하고 원본으로 생성"하는가**
