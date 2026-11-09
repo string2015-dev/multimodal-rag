@@ -18,7 +18,7 @@ from langchain_openai import ChatOpenAI
 PROJECT_ROOT = next(
     (p for p in [Path.cwd(), *Path.cwd().parents] if (p / ".env").exists()), Path.cwd(),
 )                                        # .env 가 있는 가장 가까운 상위 폴더 (노트북 notebooks/ 에서도 동작)
-MAX_CONCURRENCY = 2                      # 대문자 = 상수. 동시 요청 수 (RateLimitError 나면 더 낮추기)
+MAX_CONCURRENCY = 5                      # 대문자 = 상수. 동시 요청 수 (RateLimitError 나면 더 낮추기)
 
 # ---------------------------------------------------------------------
 # [3] 텍스트·표 요약 ─ LCEL 체인(컨베이어 벨트) + batch
@@ -57,7 +57,7 @@ def encode_image(image_path):
 # [5] 이미지 요약(VLM) ─ 텍스트 조각 + 이미지 조각을 한 메시지에 담아 호출
 # ---------------------------------------------------------------------
 def image_summarize(img_base64, prompt):
-    chat = ChatOpenAI(model="gpt-4o-mini", max_tokens=1024)    # gpt-4-vision-preview는 지원 종료
+    chat = ChatOpenAI(model="gpt-4o-mini", max_tokens=1024)
     msg = chat.invoke([HumanMessage(content=[
         {"type": "text", "text": prompt},                      # 지시문
         {"type": "image_url",                                  # 이미지 (data URL 접두사 필수)
@@ -148,5 +148,3 @@ if __name__ == "__main__":
             "img_base64_list": img_base64_list,   # 이미지 원본 (답변용, 요약과 같은 순서)
         }, f)
     print("저장 완료:", output_dir / "summaries.pkl")
-
-    # 다음 단계 예고: 요약을 임베딩 → Chroma 저장, 원본은 doc_id로 연결(Multi-Vector Retriever)
