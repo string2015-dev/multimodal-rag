@@ -18,7 +18,7 @@ from langchain_openai import ChatOpenAI
 PROJECT_ROOT = next(
     (p for p in [Path.cwd(), *Path.cwd().parents] if (p / ".env").exists()), Path.cwd(),
 )                                        # .env 가 있는 가장 가까운 상위 폴더 (노트북 notebooks/ 에서도 동작)
-MAX_CONCURRENCY = 5                      # 대문자 = 상수. 동시 요청 수 (RateLimitError 나면 더 낮추기)
+MAX_CONCURRENCY = 2                      # 대문자 = 상수. 동시 요청 수 (RateLimitError 나면 더 낮추기)
 
 # ---------------------------------------------------------------------
 # [3] 텍스트·표 요약 ─ LCEL 체인(컨베이어 벨트) + batch
