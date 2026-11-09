@@ -34,12 +34,9 @@ def load_processed():
 # ============================================================
 # 1. 다중 벡터 검색기: 서랍(vectorstore) + 서가(docstore) + 청구기호(id_key)
 # ============================================================
-try:    # langchain 1.x
-    from langchain_classic.retrievers.multi_vector import MultiVectorRetriever
-    from langchain_core.stores import InMemoryStore
-except ImportError:   # langchain 0.3
-    from langchain.retrievers.multi_vector import MultiVectorRetriever
-    from langchain.storage import InMemoryStore
+# langchain 1.x
+from langchain_classic.retrievers.multi_vector import MultiVectorRetriever
+from langchain_core.stores import InMemoryStore
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.documents import Document
